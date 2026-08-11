@@ -17,7 +17,25 @@ main{padding:8px 10px calc(25px + env(safe-area-inset-bottom))}
 .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.btn{border:0;border-radius:9px;padding:11px 8px;color:white;font-size:15px;font-weight:850}.draft{background:#33412e}.mine{background:#244887}.restore{background:#333a45;grid-column:1/-1}
 .empty{text-align:center;color:#8e97a4;padding:50px 15px}.minebadge{font-size:10px;color:#9fc0ff;margin-left:5px}
 .reset{display:block;margin:18px auto;border:0;background:transparent;color:#7f8792;text-decoration:underline;padding:8px}
-</style></head><body>
+</style><script>
+(function () {
+  var key = 'draftBoardVersion';
+  fetch('app-version.json?ts=' + Date.now(), { cache: 'no-store' })
+    .then(function (response) { return response.json(); })
+    .then(function (data) {
+      if (!data.version) return;
+      var previous = localStorage.getItem(key);
+      localStorage.setItem(key, data.version);
+      if (previous && previous !== data.version && !location.search.includes('v=')) {
+        var params = new URLSearchParams(location.search);
+        params.set('v', data.version);
+        location.replace(location.pathname + '?' + params.toString() + location.hash);
+      }
+    })
+    .catch(function () {});
+}());
+</script>
+</head><body>
 <header><h1>2026 Draft Board</h1>
 <div class="tabs"><button id="ta" class="tab on" onclick="view='available';render()">Available</button><button id="tm" class="tab" onclick="view='mine';render()">My Team</button><button id="td" class="tab" onclick="view='drafted';render()">Drafted</button></div>
 <div class="tools"><input id="q" class="search" placeholder="Search players" oninput="render()"><button class="undo" onclick="undo()">Undo</button></div>
