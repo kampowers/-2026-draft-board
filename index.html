@@ -13,6 +13,8 @@ h1{font-size:19px;margin:0 0 10px}.tabs{display:grid;grid-template-columns:repea
 main{padding:8px 10px calc(25px + env(safe-area-inset-bottom))}
 .card{background:#151920;color:#f8fafc;border:1px solid rgba(255,255,255,.22);border-left:4px solid #586273;border-radius:12px;margin:8px 0;padding:11px;box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 8px 18px rgba(0,0,0,.18)}
 .top{display:flex;align-items:center;gap:10px}.rank{font-size:18px;font-weight:850;width:30px;color:#f8fafc}.name{font-size:17px;font-weight:800;flex:1;line-height:1.15}.avg{font-size:13px;font-weight:800;color:#fff;background:rgba(5,10,20,.24);border:1px solid rgba(255,255,255,.26);border-radius:8px;padding:6px 8px}
+.jj-emblem{flex:none;width:34px;height:34px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(5,10,20,.34);font-size:22px;font-weight:900;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,.24);text-shadow:0 1px 1px rgba(0,0,0,.45)}
+.jj-target{color:#fde047}.jj-fade{color:#fda4af}.jj-dart{color:#67e8f9}
 .card.pos-qb{border-left-color:#93c5fd;background:#1d4ed8}
 .card.pos-rb{border-left-color:#fdba74;background:#9a3412}
 .card.pos-wr{border-left-color:#86efac;background:#166534}
@@ -379,6 +381,78 @@ const P=[{"player": "Jahmyr Gibbs", "etr": 1, "silva": 1, "jj": 1, "avg": 1}, {"
   "Xavier Legette": "WR"
 };
 function positionFor(name){return POSITIONS[name]||'OTHER'}
+const JJ_CALLOUTS={
+  "Jalen Hurts": "target",
+  "Justin Herbert": "target",
+  "Trevor Lawrence": "target",
+  "Ashton Jeanty": "target",
+  "Chase Brown": "target",
+  "Kenneth Walker": "target",
+  "Cam Skattebo": "target",
+  "Bhayshul Tuten": "target",
+  "Rhamondre Stevenson": "target",
+  "Jaylen Warren": "target",
+  "Jonathon Brooks": "target",
+  "Rachaad White": "target",
+  "RJ Harvey": "target",
+  "AJ Brown": "target",
+  "Zay Flowers": "target",
+  "Emeka Egbuka": "target",
+  "Luther Burden": "target",
+  "Terry McLaurin": "target",
+  "Jaylen Waddle": "target",
+  "Mike Evans": "target",
+  "Christian Watson": "target",
+  "Parker Washington": "target",
+  "Jordyn Tyson": "target",
+  "Jayden Reed": "target",
+  "Josh Downs": "target",
+  "Brock Bowers": "target",
+  "Dalton Kincaid": "target",
+  "Joe Burrow": "fade",
+  "Patrick Mahomes": "fade",
+  "Matthew Stafford": "fade",
+  "Jonathan Taylor": "fade",
+  "De'Von Achane": "fade",
+  "Josh Jacobs": "fade",
+  "Bucky Irving": "fade",
+  "Tony Pollard": "fade",
+  "JK Dobbins": "fade",
+  "Chris Olave": "fade",
+  "Garrett Wilson": "fade",
+  "DJ Moore": "fade",
+  "DK Metcalf": "fade",
+  "Michael Wilson": "fade",
+  "Courtland Sutton": "fade",
+  "Trey McBride": "fade",
+  "Jake Ferguson": "fade",
+  "Malik Willis": "dart",
+  "Kyler Murray": "dart",
+  "Tyler Shough": "dart",
+  "Jordan Mason": "dart",
+  "Keaton Mitchell": "dart",
+  "Jonah Coleman": "dart",
+  "Nick Singleton": "dart",
+  "Stefon Diggs": "dart",
+  "Quentin Johnston": "dart",
+  "Wan'Dale Robinson": "dart",
+  "Jalen Coker": "dart",
+  "De'Zhaun Stribling": "dart",
+  "Jayden Higgins": "dart",
+  "Cyrus Allen": "dart",
+  "Antonio Williams": "dart",
+  "Chig Okonkwo": "dart",
+  "Isaiah Likely": "dart",
+  "Greg Dulcich": "dart",
+  "Kenyon Sadiq": "dart",
+  "Terrance Ferguson": "dart"
+};
+const JJ_EMBLEMS={
+ target:{symbol:'◎',label:'JJ target'},
+ fade:{symbol:'↘',label:'JJ fade'},
+ dart:{symbol:'✦',label:'JJ late-round dart throw'}
+};
+function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
 let S=JSON.parse(localStorage.getItem('mobileDraft2026')||'{"d":{},"h":[]}');let view='available';
 const save=()=>localStorage.setItem('mobileDraft2026',JSON.stringify(S));
 function pick(i){if(S.d[i])return;S.d[i]=true;S.h.push(i);save();render();window.scrollTo({top:0,behavior:'smooth'})}
@@ -391,9 +465,9 @@ function render(){
  ['a','d'].forEach(x=>document.getElementById('t'+x).classList.remove('on'));
  document.getElementById(view==='available'?'ta':'td').classList.add('on');
  let q=document.getElementById('q').value.toLowerCase().trim(),o='';
- P.forEach((p,i)=>{let st=S.d[i],pos=positionFor(p.player),pc=pos.toLowerCase();if(q&&!p.player.toLowerCase().includes(q))return;if(view==='available'&&st)return;if(view==='drafted'&&!st)return;
+ P.forEach((p,i)=>{let st=S.d[i],pos=positionFor(p.player),pc=pos.toLowerCase(),callout=jjCalloutFor(p.player),mark=callout?JJ_EMBLEMS[callout]:null,emblem=mark?'<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>':'';if(q&&!p.player.toLowerCase().includes(q))return;if(view==='available'&&st)return;if(view==='drafted'&&!st)return;
  let acts=st?'<button class="btn restore" onclick="restore('+i+')">Restore to Available</button>':'<button class="btn draft" onclick="pick('+i+')">Drafted</button>';
- o+='<div class="card pos-'+pc+'"><div class="top"><div class="rank">'+(i+1)+'</div><div class="name">'+e(p.player)+'</div><div class="avg">AVG '+f(p.avg)+'</div></div><div class="details">ETR '+f(p.etr)+' &nbsp;·&nbsp; Silva '+f(p.silva)+' &nbsp;·&nbsp; JJ '+f(p.jj)+'</div><div class="actions">'+acts+'</div></div>'});
+ o+='<div class="card pos-'+pc+'"><div class="top"><div class="rank">'+(i+1)+'</div><div class="name">'+e(p.player)+'</div>'+emblem+'<div class="avg">AVG '+f(p.avg)+'</div></div><div class="details">ETR '+f(p.etr)+' &nbsp;·&nbsp; Silva '+f(p.silva)+' &nbsp;·&nbsp; JJ '+f(p.jj)+'</div><div class="actions">'+acts+'</div></div>'});
  document.getElementById('list').innerHTML=o||'<div class="empty">No players found.</div>';
 }render();
 </script></body></html>
