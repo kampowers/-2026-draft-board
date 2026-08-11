@@ -457,7 +457,11 @@ function canonicalName(name){let value=String(name||'').toLowerCase().normalize(
 function sleeperPickKeys(pick){let meta=pick.metadata||{};return [canonicalName((meta.first_name||'')+' '+(meta.last_name||'')),canonicalName((meta.team||'')+' DST')].filter(Boolean)}
 function syncStatus(message,kind){let el=document.getElementById('sync');if(!el)return;el.className='sync'+(kind?' '+kind:'');el.textContent=message}
 function isDrafted(i){return !!S.d[i]||sleeperDrafted.has(i)}
-function syncSleeper(){syncStatus('Syncing Sleeper…','');fetch('https://api.sleeper.app/v1/draft/'+SLEEPER_DRAFT_ID+'/picks?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Sleeper unavailable');return response.json()}).then(function(picks){let pickedKeys=new Set();picks.forEach(function(pick){sleeperPickKeys(pick).forEach(function(key){pickedKeys.add(key)})});let next=new Set();P.forEach(function(player,index){if(pickedKeys.has(canonicalName(player.player)))next.add(index)});sleeperDrafted=next;syncStatus('Sleeper synced · '+picks.length+' drafted','on');render()}).catch(function(){syncStatus('Sleeper sync paused — retrying…','warn')})}
+let sleeperDraftActive=false;
+let sleeperPickTimer=null;
+function stopSleeperPickSync(){if(sleeperPickTimer!==null){clearInterval(sleeperPickTimer);sleeperPickTimer=null}}
+function syncSleeperPicks(){fetch('https://api.sleeper.app/v1/draft/'+SLEEPER_DRAFT_ID+'/picks?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Sleeper unavailable');return response.json()}).then(function(picks){let pickedKeys=new Set();picks.forEach(function(pick){sleeperPickKeys(pick).forEach(function(key){pickedKeys.add(key)})});let next=new Set();P.forEach(function(player,index){if(pickedKeys.has(canonicalName(player.player)))next.add(index)});sleeperDrafted=next;syncStatus('Sleeper draft active · '+picks.length+' drafted','on');render()}).catch(function(){syncStatus('Sleeper sync paused — retrying…','warn')})}
+function checkSleeperDraft(){fetch('https://api.sleeper.app/v1/draft/'+SLEEPER_DRAFT_ID+'?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Sleeper unavailable');return response.json()}).then(function(draft){if(draft.status==='drafting'){if(!sleeperDraftActive){sleeperDraftActive=true;syncStatus('Sleeper draft active · syncing','on');syncSleeperPicks();sleeperPickTimer=setInterval(syncSleeperPicks,5000)}}else{sleeperDraftActive=false;stopSleeperPickSync();syncStatus('Sleeper ready — sync starts when the draft opens','')}}).catch(function(){stopSleeperPickSync();syncStatus('Sleeper sync paused — retrying…','warn')})}
 let S=JSON.parse(localStorage.getItem('mobileDraft2026')||'{"d":{},"h":[]}');let view='available';
 const save=()=>localStorage.setItem('mobileDraft2026',JSON.stringify(S));
 function pick(i){if(isDrafted(i))return;S.d[i]=true;S.h.push(i);save();render()}
@@ -474,5 +478,5 @@ function render(){
  let acts=st?(sleeperDrafted.has(i)?'<button class="btn restore" disabled>Drafted in Sleeper</button>':'<button class="btn restore" onclick="restore('+i+')">Restore to Available</button>'):'<button class="btn draft" onclick="pick('+i+')">Drafted</button>';
  o+='<div class="card pos-'+pc+'"><div class="top"><div class="rank">'+(i+1)+'</div><div class="name">'+e(p.player)+'</div>'+emblem+'<div class="avg">AVG '+f(p.avg)+'</div></div><div class="details">Silva '+f(p.silva)+' &nbsp;·&nbsp; ETR '+f(p.etr)+' &nbsp;·&nbsp; JJ '+f(p.jj)+'</div><div class="actions">'+acts+'</div></div>'});
  document.getElementById('list').innerHTML=o||'<div class="empty">No players found.</div>';
-}render();syncSleeper();setInterval(syncSleeper,5000);
+}render();checkSleeperDraft();setInterval(checkSleeperDraft,30000);
 </script></body></html>
