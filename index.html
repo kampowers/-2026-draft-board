@@ -26,8 +26,8 @@ main{padding:8px 10px calc(25px + env(safe-area-inset-bottom))}
       if (!data.version) return;
       var previous = localStorage.getItem(key);
       localStorage.setItem(key, data.version);
-      if (previous && previous !== data.version && !location.search.includes('v=')) {
-        var params = new URLSearchParams(location.search);
+      var params = new URLSearchParams(location.search);
+      if (previous && previous !== data.version && params.get('v') !== data.version) {
         params.set('v', data.version);
         location.replace(location.pathname + '?' + params.toString() + location.hash);
       }
