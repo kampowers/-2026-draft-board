@@ -481,5 +481,5 @@ function render(){
  let acts=st?(sleeperDrafted.has(i)?'<button class="btn restore" disabled>Drafted in Sleeper</button>':'<button class="btn restore" onclick="restore('+i+')">Restore to Available</button>'):'<button class="btn draft" onclick="pick('+i+')">Drafted</button>';
  o+='<div class="card pos-'+pc+'"><div class="top"><div class="rank">'+(i+1)+'</div><div class="name">'+e(p.player)+'</div>'+emblem+'<div class="avg">AVG '+f(p.avg)+'</div></div><div class="details">Silva '+f(p.silva)+' &nbsp;·&nbsp; ETR '+f(p.etr)+' &nbsp;·&nbsp; JJ '+f(p.jj)+'</div><div class="actions">'+acts+'</div></div>'});
  document.getElementById('list').innerHTML=o||'<div class="empty">No players found.</div>';
-}render();checkSleeperDraft();setInterval(checkSleeperDraft,5000);document.addEventListener('visibilitychange',function(){if(!document.hidden)checkSleeperDraft()});
+}render();checkSleeperDraft();setInterval(checkSleeperDraft,1000);document.addEventListener('visibilitychange',function(){if(!document.hidden)checkSleeperDraft()});
 </script></body></html>
