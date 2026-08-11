@@ -452,7 +452,7 @@ const JJ_EMBLEMS={
 function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
 let S=JSON.parse(localStorage.getItem('mobileDraft2026')||'{"d":{},"h":[]}');let view='available';
 const save=()=>localStorage.setItem('mobileDraft2026',JSON.stringify(S));
-function pick(i){if(S.d[i])return;S.d[i]=true;S.h.push(i);save();render();window.scrollTo({top:0,behavior:'smooth'})}
+function pick(i){if(S.d[i])return;S.d[i]=true;S.h.push(i);save();render()}
 function restore(i){delete S.d[i];S.h=S.h.filter(x=>x!==i);save();render()}
 function undo(){let i=S.h.pop();if(i===undefined)return;delete S.d[i];save();render()}
 function resetAll(){if(confirm('Reset all draft picks?')){S={d:{},h:[]};save();render()}}
