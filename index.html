@@ -33,13 +33,13 @@ main{padding:8px 10px calc(25px + env(safe-area-inset-bottom))}
     .then(function (response) { return response.json(); })
     .then(function (data) {
       if (!data.version) return;
-      var previous = localStorage.getItem(key);
-      localStorage.setItem(key, data.version);
       var params = new URLSearchParams(location.search);
-      if (previous && previous !== data.version && params.get('v') !== data.version) {
+      if (params.get('v') !== data.version) {
         params.set('v', data.version);
         location.replace(location.pathname + '?' + params.toString() + location.hash);
+        return;
       }
+      localStorage.setItem(key, data.version);
     })
     .catch(function () {});
 }());
