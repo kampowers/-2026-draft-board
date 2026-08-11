@@ -50,14 +50,12 @@ function resetAll(){if(confirm('Reset all draft picks?')){S={d:{},h:[]};save();r
 function e(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function f(x){if(x==null||x==='')return '—';return Number(x).toFixed(Number(x)%1?2:0)}
 function render(){
- ['a','m','d'].forEach(x=>document.getElementById('t'+x).classList.remove('on'));
- document.getElementById(view==='available'?'ta':view==='mfunction render(){
  ['a','d'].forEach(x=>document.getElementById('t'+x).classList.remove('on'));
  document.getElementById(view==='available'?'ta':'td').classList.add('on');
  let q=document.getElementById('q').value.toLowerCase().trim(),o='';
  P.forEach((p,i)=>{let st=S.d[i];if(q&&!p.player.toLowerCase().includes(q))return;if(view==='available'&&st)return;if(view==='drafted'&&!st)return;
- let acts=st?`<button class="btn restore" onclick="restore(${i})">Restore to Available</button>`:`<button class="btn draft" onclick="pick(${i})">Drafted</button>`;
- o+=`<div class="card"><div class="top"><div class="rank">${i+1}</div><div class="name">${e(p.player)}</div><div class="avg">AVG ${f(p.avg)}</div></div><div class="details">ETR ${f(p.etr)} &nbsp;·&nbsp; Silva ${f(p.silva)} &nbsp;·&nbsp; JJ ${f(p.jj)}</div><div class="actions">${acts}</div></div>`});
+ let acts=st?'<button class="btn restore" onclick="restore('+i+')">Restore to Available</button>':'<button class="btn draft" onclick="pick('+i+')">Drafted</button>';
+ o+='<div class="card"><div class="top"><div class="rank">'+(i+1)+'</div><div class="name">'+e(p.player)+'</div><div class="avg">AVG '+f(p.avg)+'</div></div><div class="details">ETR '+f(p.etr)+' &nbsp;·&nbsp; Silva '+f(p.silva)+' &nbsp;·&nbsp; JJ '+f(p.jj)+'</div><div class="actions">'+acts+'</div></div>'});
  document.getElementById('list').innerHTML=o||'<div class="empty">No players found.</div>';
 }render();
 </script></body></html>
