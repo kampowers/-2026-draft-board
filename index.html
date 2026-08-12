@@ -454,7 +454,13 @@ const EXODIA_PLAYERS={'Luther Burden':true,'Parker Washington':true,'Mike Evans'
 function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
 function emblemsFor(name){let callout=jjCalloutFor(name),emblems=[];if(callout){let mark=JJ_EMBLEMS[callout];emblems.push('<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>')}if(EXODIA_PLAYERS[name])emblems.push('<span class="jj-emblem exodia-emblem" role="img" aria-label="Exodia" title="Exodia">⚡</span>');return emblems.join('')}
 const SLEEPER_DRAFT_ID='1393054101918461952';
-let sleeperDrafted=new Set();
+const DRAFT_STATE_KEY='mobileDraft2026:'+SLEEPER_DRAFT_ID;
+const SLEEPER_STATE_KEY='sleeperDraft2026:'+SLEEPER_DRAFT_ID;
+function loadSleeperState(){try{return JSON.parse(localStorage.getItem(SLEEPER_STATE_KEY)||'{"drafted":[],"count":0}')}catch(error){return{drafted:[],count:0}}}
+function saveSleeperState(){localStorage.setItem(SLEEPER_STATE_KEY,JSON.stringify({drafted:Array.from(sleeperDrafted),count:sleeperPickTotal}))}
+let savedSleeperState=loadSleeperState();
+let sleeperDrafted=new Set(savedSleeperState.drafted||[]);
+let sleeperPickTotal=Number(savedSleeperState.count)||0;
 let sleeperTeams=0;
 function canonicalName(name){let value=String(name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');if(value==='cameronward')return'camward';if(value==='nickolassingleton')return'nicksingleton';return value}
 function sleeperPickKeys(pick){let meta=pick.metadata||{},position=String(meta.position||pick.position||'').toUpperCase(),isDefense=position==='DEF'||position==='DST'||position==='D/ST';return [canonicalName((meta.first_name||'')+' '+(meta.last_name||'')),isDefense?canonicalName((meta.team||'')+' DST'):''].filter(Boolean)}
@@ -465,14 +471,14 @@ let sleeperDraftActive=false;
 let sleeperSyncPaused=false;
 let sleeperPickTimer=null;
 function stopSleeperPickSync(){if(sleeperPickTimer!==null){clearInterval(sleeperPickTimer);sleeperPickTimer=null}}
-function syncSleeperPicks(){fetch('https://api.sleeper.app/v1/draft/'+SLEEPER_DRAFT_ID+'/picks?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Sleeper unavailable');return response.json()}).then(function(picks){let pickedKeys=new Set();picks.forEach(function(pick){sleeperPickKeys(pick).forEach(function(key){pickedKeys.add(key)})});let next=new Set();P.forEach(function(player,index){if(pickedKeys.has(canonicalName(player.player)))next.add(index)});sleeperDrafted=next;setCurrentPick(picks.length+1);syncStatus('Sleeper draft active · syncing','on');render()}).catch(function(){syncStatus('Sleeper sync paused — retrying…','warn')})}
-function checkSleeperDraft(){if(sleeperSyncPaused){stopSleeperPickSync();setCurrentPick(0);syncStatus('Sleeper sync paused — send the next draft link to reconnect','');return}fetch('https://api.sleeper.app/v1/draft/'+SLEEPER_DRAFT_ID+'?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Sleeper unavailable');return response.json()}).then(function(draft){sleeperTeams=Number(draft.settings&&draft.settings.teams)||Object.keys(draft.draft_order||{}).length||sleeperTeams;if(draft.status==='drafting'){if(!sleeperDraftActive){sleeperDraftActive=true;syncStatus('Sleeper draft active · syncing','on');syncSleeperPicks();sleeperPickTimer=setInterval(syncSleeperPicks,1000)}}else{sleeperDraftActive=false;stopSleeperPickSync();setCurrentPick(0);syncStatus('Synced','on')}}).catch(function(){sleeperDraftActive=false;stopSleeperPickSync();setCurrentPick(0);syncStatus('Sleeper sync paused — retrying…','warn')})}
-let S=JSON.parse(localStorage.getItem('mobileDraft2026')||'{"d":{},"h":[]}');let view='available';
-const save=()=>localStorage.setItem('mobileDraft2026',JSON.stringify(S));
+function syncSleeperPicks(){fetch('https://api.sleeper.app/v1/draft/'+SLEEPER_DRAFT_ID+'/picks?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Sleeper unavailable');return response.json()}).then(function(picks){let pickedKeys=new Set();picks.forEach(function(pick){sleeperPickKeys(pick).forEach(function(key){pickedKeys.add(key)})});let next=new Set();P.forEach(function(player,index){if(pickedKeys.has(canonicalName(player.player)))next.add(index)});sleeperDrafted=next;sleeperPickTotal=picks.length;saveSleeperState();setCurrentPick(sleeperPickTotal+1);syncStatus('Sleeper draft active · syncing','on');render()}).catch(function(){if(sleeperPickTotal>0)setCurrentPick(sleeperPickTotal+1);syncStatus('Offline — showing saved draft state','warn')})}
+function checkSleeperDraft(){if(sleeperSyncPaused){stopSleeperPickSync();setCurrentPick(0);syncStatus('Sleeper sync paused — send the next draft link to reconnect','');return}fetch('https://api.sleeper.app/v1/draft/'+SLEEPER_DRAFT_ID+'?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Sleeper unavailable');return response.json()}).then(function(draft){sleeperTeams=Number(draft.settings&&draft.settings.teams)||Object.keys(draft.draft_order||{}).length||sleeperTeams;if(draft.status==='drafting'){if(!sleeperDraftActive){sleeperDraftActive=true;syncStatus('Sleeper draft active · syncing','on');syncSleeperPicks();sleeperPickTimer=setInterval(syncSleeperPicks,1000)}}else{sleeperDraftActive=false;stopSleeperPickSync();setCurrentPick(0);syncStatus('Synced','on')}}).catch(function(){sleeperDraftActive=false;stopSleeperPickSync();if(sleeperPickTotal>0)setCurrentPick(sleeperPickTotal+1);syncStatus('Offline — showing saved draft state','warn')})}
+let S;try{S=JSON.parse(localStorage.getItem(DRAFT_STATE_KEY)||localStorage.getItem('mobileDraft2026')||'{"d":{},"h":[]}')}catch(error){S={d:{},h:[]}}let view='available';
+const save=()=>localStorage.setItem(DRAFT_STATE_KEY,JSON.stringify(S));
 function pick(i){if(isDrafted(i))return;S.d[i]=true;S.h.push(i);save();render()}
 function restore(i){if(sleeperDrafted.has(i))return;delete S.d[i];S.h=S.h.filter(x=>x!==i);save();render()}
 function undo(){let i=S.h.pop();if(i===undefined)return;delete S.d[i];save();render()}
-function resetAll(){if(confirm('Reset all draft picks?')){S={d:{},h:[]};sleeperDrafted=new Set();sleeperSyncPaused=true;sleeperDraftActive=false;stopSleeperPickSync();setCurrentPick(0);syncStatus('Board reset · send the next draft link to reconnect','');save();render()}}
+function resetAll(){if(confirm('Reset all draft picks?')){S={d:{},h:[]};sleeperDrafted=new Set();sleeperPickTotal=0;saveSleeperState();sleeperSyncPaused=true;sleeperDraftActive=false;stopSleeperPickSync();setCurrentPick(0);syncStatus('Board reset · send the next draft link to reconnect','');save();render()}}
 function e(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function f(x){if(x==null||x==='')return '—';return Number(x).toFixed(Number(x)%1?2:0)}
 function render(){
