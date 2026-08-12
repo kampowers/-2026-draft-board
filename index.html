@@ -14,7 +14,7 @@ main{padding:8px 10px calc(25px + env(safe-area-inset-bottom))}
 .card{background:#151920;color:#f8fafc;border:1px solid rgba(255,255,255,.22);border-left:4px solid #586273;border-radius:12px;margin:8px 0;padding:11px;box-shadow:0 1px 0 rgba(255,255,255,.14) inset,0 8px 18px rgba(0,0,0,.18)}
 .top{display:flex;align-items:center;gap:10px}.rank{font-size:18px;font-weight:850;width:30px;color:#f8fafc}.name{font-size:22px;font-weight:800;flex:1;line-height:1.15}.avg{font-size:13px;font-weight:800;color:#fff;background:rgba(5,10,20,.24);border:1px solid rgba(255,255,255,.26);border-radius:8px;padding:6px 8px}
 .jj-emblem{flex:none;width:34px;height:34px;display:grid;place-items:center;border:2px solid rgba(255,255,255,.72);border-radius:50%;background:rgba(5,10,20,.34);font-size:22px;font-weight:900;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,.24);text-shadow:0 1px 1px rgba(0,0,0,.45)}
-.jj-target{color:#86efac}.jj-fade{color:#fda4af}.jj-dart{color:#67e8f9}
+.jj-target{color:#86efac}.jj-fade{color:#fda4af}.jj-dart{color:#67e8f9}.exodia-emblem{color:#fde047}
 .card.pos-qb{border-left-color:#fca5a5;background:#b91c1c}
 .card.pos-rb{border-left-color:#86efac;background:#166534}
 .card.pos-wr{border-left-color:#93c5fd;background:#1d4ed8}
@@ -450,7 +450,9 @@ const JJ_EMBLEMS={
  fade:{symbol:'↘',label:'JJ fade'},
  dart:{symbol:'✦',label:'JJ late-round dart throw'}
 };
+const EXODIA_PLAYERS={'Luther Burden':true,'Parker Washington':true,'Mike Evans':true};
 function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
+function emblemsFor(name){let callout=jjCalloutFor(name),emblems=[];if(callout){let mark=JJ_EMBLEMS[callout];emblems.push('<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>')}if(EXODIA_PLAYERS[name])emblems.push('<span class="jj-emblem exodia-emblem" role="img" aria-label="Exodia" title="Exodia">⚡</span>');return emblems.join('')}
 const SLEEPER_DRAFT_ID='1393054101918461952';
 let sleeperDrafted=new Set();
 let sleeperTeams=0;
@@ -477,7 +479,7 @@ function render(){
  ['a','d'].forEach(x=>document.getElementById('t'+x).classList.remove('on'));
  document.getElementById(view==='available'?'ta':'td').classList.add('on');
  let q=document.getElementById('q').value.toLowerCase().trim(),o='';
- P.forEach((p,i)=>{let st=isDrafted(i),pos=positionFor(p.player),pc=pos.toLowerCase(),callout=jjCalloutFor(p.player),mark=callout?JJ_EMBLEMS[callout]:null,emblem=mark?'<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>':'';if(q&&!p.player.toLowerCase().includes(q))return;if(view==='available'&&st)return;if(view==='drafted'&&!st)return;
+ P.forEach((p,i)=>{let st=isDrafted(i),pos=positionFor(p.player),pc=pos.toLowerCase(),emblem=emblemsFor(p.player);if(q&&!p.player.toLowerCase().includes(q))return;if(view==='available'&&st)return;if(view==='drafted'&&!st)return;
  let acts=st?(sleeperDrafted.has(i)?'<button class="btn restore" disabled>Drafted in Sleeper</button>':'<button class="btn restore" onclick="restore('+i+')">Restore to Available</button>'):'<button class="btn draft" onclick="pick('+i+')">Drafted</button>';
  o+='<div class="card pos-'+pc+'"><div class="top"><div class="rank">'+(i+1)+'</div><div class="name">'+e(p.player)+'</div>'+emblem+'<div class="avg">AVG '+f(p.avg)+'</div></div><div class="details">Silva '+f(p.silva)+' &nbsp;·&nbsp; ETR '+f(p.etr)+' &nbsp;·&nbsp; JJ '+f(p.jj)+'</div><div class="actions">'+acts+'</div></div>'});
  document.getElementById('list').innerHTML=o||'<div class="empty">No players found.</div>';
