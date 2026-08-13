@@ -454,7 +454,7 @@ const JJ_EMBLEMS={
 const EXODIA_PLAYERS={'Luther Burden':true,'Parker Washington':true,'Mike Evans':true};
 function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
 function emblemsFor(name){let callout=jjCalloutFor(name),emblems=[];if(callout){let mark=JJ_EMBLEMS[callout];emblems.push('<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>')}if(EXODIA_PLAYERS[name])emblems.push('<span class="jj-emblem exodia-emblem" role="img" aria-label="Exodia" title="Exodia">⚡</span>');return emblems.join('')}
-const SLEEPER_DRAFT_ID='1380061606636945409';
+const SLEEPER_DRAFT_ID='1393468223353004032';
 const DRAFT_STATE_KEY='mobileDraft2026:v3:'+SLEEPER_DRAFT_ID;
 const SLEEPER_STATE_KEY='sleeperDraft2026:v3:'+SLEEPER_DRAFT_ID;
 function loadSleeperState(){try{return JSON.parse(localStorage.getItem(SLEEPER_STATE_KEY)||'{"drafted":[],"count":0}')}catch(error){return{drafted:[],count:0}}}
