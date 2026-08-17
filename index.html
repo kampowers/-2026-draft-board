@@ -456,7 +456,7 @@ const JJ_EMBLEMS={
  fade:{symbol:'↘',label:'JJ fade'},
  dart:{symbol:'◇',label:'JJ late-round dart throw'}
 };
-const EXODIA_PLAYERS={'Luther Burden':true,'Parker Washington':true,'Mike Evans':true};
+const EXODIA_PLAYERS={'Luther Burden':true,'Parker Washington':true,'Mike Evans':true,'David Montgomery':true,'Jonathon Brooks':true};
 function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
 function emblemsFor(name){let callout=jjCalloutFor(name),emblems=[];if(callout){let mark=JJ_EMBLEMS[callout];emblems.push('<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>')}if(EXODIA_PLAYERS[name])emblems.push('<span class="jj-emblem exodia-emblem" role="img" aria-label="Exodia" title="Exodia">⚡</span>');return emblems.join('')}
 const CONNECTED_DRAFT_KEY='draftBoard2026:connectedSleeperDraft';
