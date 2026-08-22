@@ -448,7 +448,7 @@ const JJ_EMBLEMS={
  dart:{symbol:'◇',label:'JJ late-round dart throw'}
 };
 const EXODIA_PLAYERS={'Luther Burden':true,'Parker Washington':true,'Mike Evans':true,'David Montgomery':true,'Jonathon Brooks':true};
-const SILVA_FADES={"Bucky Irving":true,"Bhayshul Tuten":true,"DK Metcalf":true,"Brian Thomas":true,"RJ Harvey":true,"Patrick Mahomes":true,"Matthew Stafford":true,"Aaron Jones":true,"Chuba Hubbard":true,"Courtland Sutton":true,"Jake Ferguson":true,"Jauan Jennings":true,"Oronde Gadsden":true,"Omar Cooper":true};
+const SILVA_FADES={"Bucky Irving":true,"Bhayshul Tuten":true,"DK Metcalf":true,"Brian Thomas":true,"RJ Harvey":true,"Patrick Mahomes":true,"Matthew Stafford":true,"Aaron Jones":true,"Chuba Hubbard":true,"Courtland Sutton":true,"Jake Ferguson":true,"Jauan Jennings":true,"Oronde Gadsden":true,"Omar Cooper":true,"Cam Skattebo":true,"Quinshon Judkins":true,"Josh Jacobs":true,"Rashee Rice":true,"Kyren Williams":true,"Trey McBride":true,"AJ Brown":true,"Jeremiyah Love":true,"De'Von Achane":true,"Saquon Barkley":true,"Justin Jefferson":true};
 function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
 function emblemsFor(name){let callout=jjCalloutFor(name),emblems=[];if(callout){let mark=JJ_EMBLEMS[callout];emblems.push('<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>')}if(SILVA_FADES[name])emblems.push('<span class="jj-emblem jj-fade silva-fade" role="img" aria-label="Silva fade" title="Silva fade">−</span>');if(EXODIA_PLAYERS[name])emblems.push('<span class="jj-emblem exodia-emblem" role="img" aria-label="Exodia" title="Exodia">⚡</span>');return emblems.join('')}
 const CONNECTED_DRAFT_KEY='draftBoard2026:connectedSleeperDraft';
