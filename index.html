@@ -384,20 +384,20 @@ function positionFor(name){return POSITIONS[name]||'OTHER'}
 const JJ_CALLOUTS={
   "Jalen Hurts": "target",
   "Justin Herbert": "target",
-  "Trevor Lawrence": "target",
-  "Ashton Jeanty": "target",
+  "Brock Purdy": "target",
   "Chase Brown": "target",
   "Kenneth Walker": "target",
   "Bhayshul Tuten": "target",
   "Rhamondre Stevenson": "target",
   "Jaylen Warren": "target",
   "Jonathon Brooks": "target",
+  "RJ Harvey": "target",
   "AJ Brown": "target",
+  "Devonta Smith": "target",
   "Zay Flowers": "target",
   "Emeka Egbuka": "target",
   "Luther Burden": "target",
   "Jaylen Waddle": "target",
-  "Mike Evans": "target",
   "Christian Watson": "target",
   "Parker Washington": "target",
   "Jayden Reed": "target",
@@ -427,7 +427,8 @@ const JJ_CALLOUTS={
   "Jordan Mason": "dart",
   "Keaton Mitchell": "dart",
   "Jonah Coleman": "dart",
-  "Nick Singleton": "dart",
+  "Chris Rodriguez": "dart",
+  "Tyjae Spears": "dart",
   "MarShawn Lloyd": "dart",
   "Stefon Diggs": "dart",
   "Wan'Dale Robinson": "dart",
@@ -454,8 +455,8 @@ function jjCalloutFor(name){return JJ_CALLOUTS[name]||''}
 function emblemsFor(name){let callout=jjCalloutFor(name),emblems=[];if(callout){let mark=JJ_EMBLEMS[callout];emblems.push('<span class="jj-emblem jj-'+callout+'" role="img" aria-label="'+mark.label+'" title="'+mark.label+'">'+mark.symbol+'</span>')}if(SILVA_FADES[name])emblems.push('<span class="jj-emblem jj-fade silva-fade" role="img" aria-label="Silva fade" title="Silva fade">−</span>');if(EXODIA_PLAYERS[name])emblems.push('<span class="jj-emblem exodia-emblem" role="img" aria-label="Exodia" title="Exodia">⚡</span>');return emblems.join('')}
 const CONNECTED_DRAFT_KEY='draftBoard2026:connectedSleeperDraft';
 let SLEEPER_DRAFT_ID=localStorage.getItem(CONNECTED_DRAFT_KEY)||'';
-const DRAFT_STATE_KEY='mobileDraft2026:v19:'+SLEEPER_DRAFT_ID;
-const SLEEPER_STATE_KEY='sleeperDraft2026:v19:'+SLEEPER_DRAFT_ID;
+const DRAFT_STATE_KEY='mobileDraft2026:v20:'+SLEEPER_DRAFT_ID;
+const SLEEPER_STATE_KEY='sleeperDraft2026:v20:'+SLEEPER_DRAFT_ID;
 function parseDraftId(value){let text=String(value||'').trim(),match=text.match(/(?:drafts?|draft)(?:\/[^/?#]+)*\/([0-9]{8,})(?:[/?#]|$)/i)||text.match(/^([0-9]{8,})$/);return match?match[1]:''}
 function updateDraftControls(){let details=document.getElementById('draftConnection'),summary=document.getElementById('draftSummary'),input=document.getElementById('draftUrl'),connect=document.getElementById('connectBtn'),disconnect=document.getElementById('disconnectBtn');if(!input)return;input.value=SLEEPER_DRAFT_ID;connect.textContent=SLEEPER_DRAFT_ID?'Change':'Connect';disconnect.hidden=!SLEEPER_DRAFT_ID;details.open=!SLEEPER_DRAFT_ID;summary.textContent=SLEEPER_DRAFT_ID?'Sleeper draft · connected':'Sleeper draft · connect'}
 function connectDraft(){let input=document.getElementById('draftUrl'),button=document.getElementById('connectBtn'),id=parseDraftId(input&&input.value);if(!id){syncStatus('Paste a valid Sleeper draft link or numeric draft ID','warn');return}button.disabled=true;button.textContent='Checking…';fetch('https://api.sleeper.app/v1/draft/'+id+'?ts='+Date.now(),{cache:'no-store'}).then(function(response){if(!response.ok)throw new Error('Draft not found');return response.json()}).then(function(draft){if(String(draft.draft_id||'')!==id)throw new Error('Draft not found');localStorage.setItem(CONNECTED_DRAFT_KEY,id);location.reload()}).catch(function(error){button.disabled=false;button.textContent=SLEEPER_DRAFT_ID?'Change':'Connect';syncStatus('Not connected — '+error.message,'warn')})}
